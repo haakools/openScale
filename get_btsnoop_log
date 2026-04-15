@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+AUTO=false
+[[ "$1" == "-y" ]] && AUTO=true
+
+if [ "$AUTO" = false ]; then
+  echo "
+Extracts btsnoop_hci.log from a Samsung Android device via adb bugreport.
+
+Before running:
+  1. Enable HCI snoop log in Settings -> Developer Options -> Bluetooth HCI snoop log
+  2. Toggle Bluetooth off and on
+  3. Perform the Bluetooth activity you want to capture
+
+Press enter to continue..."
+  read -r
+fi
+
+set -e
+
+DEVICES=$(adb devices | grep -v "List of devices" | grep "device$")
+if [ -z "$DEVICES" ]; then
+  echo "ERROR: No adb device found. Check USB connection, USB mode (must be File Transfer/MTP), and USB debugging authorization on the phone."
+  exit 1
+fi
+
+echo "Running adb bugreport..."
+adb bugreport bugreport.zip
+
+SNOOP_PATH=$(unzip -l bugreport.zip | grep -oP '\S+btsnoop_hci\.log')
+
+if [ -z "$SNOOP_PATH" ]; then
+  echo "ERROR: btsnoop_hci.log not found in bugreport."
+  echo "  - Was HCI snoop log enabled in Developer Options?"
+  echo "  - Was Bluetooth toggled off and on after enabling it?"
+  echo "  - Was Bluetooth activity performed before running this script?"
+  exit 1
+fi
+
+unzip -o bugreport.zip "$SNOOP_PATH" -d .
+
+echo "Log file at: ./$SNOOP_PATH"
+
+
