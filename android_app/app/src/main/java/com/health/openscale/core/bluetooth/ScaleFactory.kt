@@ -61,6 +61,7 @@ import com.health.openscale.core.bluetooth.scales.StandardBeurerSanitasHandler
 import com.health.openscale.core.bluetooth.scales.TrisaBodyAnalyzeHandler
 import com.health.openscale.core.bluetooth.scales.TuningProfile
 import com.health.openscale.core.bluetooth.scales.YunmaiHandler
+import com.health.openscale.core.bluetooth.scales.NOOABodywiseHandler
 import com.health.openscale.core.facade.MeasurementFacade
 import com.health.openscale.core.facade.SettingsFacade
 import com.health.openscale.core.facade.UserFacade
@@ -126,6 +127,7 @@ class ScaleFactory @Inject constructor(
         BeurerSanitasHandler(),
         AAAxHandler(),
         ActiveEraBF06Handler(),
+        NOOABodywiseHandler(),
     )
 
     /**

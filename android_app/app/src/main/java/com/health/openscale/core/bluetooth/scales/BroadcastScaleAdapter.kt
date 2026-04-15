@@ -77,13 +77,13 @@ class BroadcastScaleAdapter(
             // De-dup: collapse identical packets within packetDedupWindowMs
             val bytes = scanResult.scanRecord?.bytes
 
-            LogManager.d(TAG,"Discovered advertisement from ${peripheral.address} RSSI=$rssi ${bytes?.toHexPreview(24)}")
+            LogManager.v(TAG,"Discovered advertisement from ${peripheral.address} RSSI=$rssi ${bytes?.toHexPreview(32)}")
 
             val hash = contentHash(bytes, rssi)
             val t = now()
             val last = dedupSeen[hash]
             if (last != null && (t - last) <= tuning.packetDedupWindowMs) {
-                LogManager.w(TAG, "Deduplicated packet hash=$hash from ${peripheral.address}")
+                LogManager.v(TAG, "Deduplicated packet hash=$hash from ${peripheral.address}")
                 return
             }
             dedupSeen[hash] = t
@@ -94,12 +94,12 @@ class BroadcastScaleAdapter(
 
             // Optional stabilization: avoid forwarding bursts too quickly
             if (t - lastForwardAtMs < tuning.stabilizeWindowMs) {
-                LogManager.w(TAG, "Skipping forwarding to handler (stabilize window) from ${peripheral.address}")
+                LogManager.v(TAG, "Skipping forwarding to handler (stabilize window) from ${peripheral.address}")
                 return
             }
 
             val user = selectedUserSnapshot ?: return
-            LogManager.d(TAG,"Forwarding advertisement to handler: ${peripheral.address} RSSI=$rssi ${bytes?.toHexPreview(24)}")
+            LogManager.d(TAG,"Forwarding advertisement to handler: ${peripheral.address} RSSI=$rssi ${bytes?.toHexPreview(32)}")
             val action = handler.onAdvertisement(scanResult, user)
             LogManager.d(TAG, "Handler returned $action for ${peripheral.address}")
 
